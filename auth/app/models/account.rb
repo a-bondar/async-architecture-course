@@ -20,20 +20,21 @@ class Account < ApplicationRecord
   enum role: [:employee, :manager, :admin]
 
   def assign_id
-    self.public_id = SecureRandom.uuid if self.public_id.blank?
+    self.public_id = SecureRandom.uuid if public_id.blank?
   end
 
   def produce_account_created_event
     event = {
       event_name: 'AccountCreated',
       data: {
-        public_id: self.public_id,
-        email: self.email,
-        full_name: self.full_name,
-        position: self.position
+        public_id:,
+        email:,
+        full_name:,
+        position:,
+        role:
       }
     }
 
-    Producer.call(event.to_json, topic: 'accounts-stream')
+    KAFKA_PRODUCER.produce_sync(topic: 'accounts-stream', payload: event.to_json)
   end
 end

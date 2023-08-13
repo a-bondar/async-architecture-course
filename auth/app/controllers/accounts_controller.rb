@@ -20,7 +20,6 @@ class AccountsController < ApplicationController
       new_role = @account.role != account_params[:role] ? account_params[:role] : nil
 
       if @account.update(account_params)
-        # ----------------------------- produce event -----------------------
         event = {
           event_name: 'AccountUpdated',
           data: {
@@ -30,17 +29,18 @@ class AccountsController < ApplicationController
             position: @account.position
           }
         }
-        Producer.call(event.to_json, topic: 'accounts-stream')
+
+        KAFKA_PRODUCER.produce_sync(topic: 'accounts-stream', payload: event.to_json)
 
         if new_role
           event = {
             event_name: 'AccountRoleChanged',
             data: { public_id: @account.public_id, role: @account.role }
           }
-          # Producer.call(event.to_json, topic: 'accounts')
+
+          KAFKA_PRODUCER.produce_sync(topic: 'accounts', payload: event.to_json)
         end
 
-        # --------------------------------------------------------------------
         format.html { redirect_to root_path, notice: 'Account was successfully updated.' }
       else
         format.html { render :edit }
@@ -51,13 +51,12 @@ class AccountsController < ApplicationController
   def destroy
     @account.update(active: false, disabled_at: Time.now)
 
-    # ----------------------------- produce event -----------------------
     event = {
       event_name: 'AccountDeleted',
       data: { public_id: @account.public_id }
     }
-    Producer.call(event.to_json, topic: 'accounts-stream')
-    # --------------------------------------------------------------------
+
+    KAFKA_PRODUCER.produce_sync(topic: 'accounts-stream', payload: event.to_json)
 
     respond_to do |format|
       format.html { redirect_to root_path, notice: 'Account was successfully destroyed.' }
