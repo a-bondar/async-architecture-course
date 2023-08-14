@@ -3,7 +3,7 @@ class TasksController < ApplicationController
 
   # GET /tasks
   def index
-    @tasks = Task.where(account_id: account.id) if current_account.employee?
+    @tasks = current_account.tasks if current_account.employee?
     @tasks = Task.all if current_account.manager? || current_account.admin?
   end
 
@@ -104,6 +104,6 @@ class TasksController < ApplicationController
     end
 
   def current_account
-    session[:account]
+    Account.find_by(id: session[:account]["id"])
   end
 end

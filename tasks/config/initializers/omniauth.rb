@@ -5,5 +5,5 @@ module OmniAuth
 end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
-  provider :keepa, ENV["KEEPA_KEY"], ENV["KEEPA_SECRET"], {:provider_ignores_state => true}
+  provider :keepa, ENV["KEEPA_KEY"], ENV["KEEPA_SECRET"], { provider_ignores_state: true, scope: 'public read write' }
 end
