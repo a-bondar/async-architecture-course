@@ -39,3 +39,5 @@ gem "omniauth-rails_csrf_protection", "~> 1.0"
 gem "omniauth-oauth2", "~> 1.8"
 
 gem "dotenv-rails", "~> 2.8"
+
+gem "schema_registry", github: "davydovanton/event_schema_registry", ref: "refs/pull/8/head"

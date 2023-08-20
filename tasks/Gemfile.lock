@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/davydovanton/event_schema_registry.git
+  revision: fc871856f3b6268de1d2311587abc2d0dea50b7b
+  ref: refs/pull/8/head
+  specs:
+    schema_registry (1)
+      json-schema
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -66,6 +74,8 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    addressable (2.8.5)
+      public_suffix (>= 2.0.2, < 6.0)
     builder (3.2.4)
     concurrent-ruby (1.2.2)
     crass (1.0.6)
@@ -93,6 +103,8 @@ GEM
     io-console (0.6.0)
     irb (1.7.4)
       reline (>= 0.3.6)
+    json-schema (4.0.0)
+      addressable (>= 2.8)
     jwt (2.7.1)
     karafka (2.1.9)
       karafka-core (>= 2.1.1, < 2.2.0)
@@ -149,6 +161,7 @@ GEM
     omniauth-rails_csrf_protection (1.0.1)
       actionpack (>= 4.2)
       omniauth (~> 2.0)
+    public_suffix (5.0.3)
     puma (5.6.6)
       nio4r (~> 2.0)
     racc (1.7.1)
@@ -226,6 +239,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection (~> 1.0)
   puma (~> 5.0)
   rails (~> 7.0.7)
+  schema_registry!
   sprockets-rails
   sqlite3 (~> 1.4)
   tzinfo-data

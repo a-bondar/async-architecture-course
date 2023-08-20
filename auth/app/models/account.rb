@@ -25,7 +25,11 @@ class Account < ApplicationRecord
 
   def produce_account_created_event
     event = {
+      event_id: SecureRandom.uuid,
+      event_version: 1,
       event_name: 'AccountCreated',
+      event_time: Time.now.utc.iso8601,
+      producer: 'auth_service',
       data: {
         public_id:,
         email:,
@@ -35,6 +39,8 @@ class Account < ApplicationRecord
       }
     }
 
-    KAFKA_PRODUCER.produce_sync(topic: 'accounts-stream', payload: event.to_json)
+    result = SchemaRegistry.validate_event(event, 'accounts.created', version: 1)
+
+    KAFKA_PRODUCER.produce_sync(topic: 'accounts-stream', payload: event.to_json) if result.success?
   end
 end

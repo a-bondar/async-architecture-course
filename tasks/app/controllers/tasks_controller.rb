@@ -27,14 +27,22 @@ class TasksController < ApplicationController
 
     if @task.save
       event = {
+        event_id: SecureRandom.uuid,
+        event_version: 1,
         event_name: 'TaskCreated',
+        event_time: Time.now.utc.iso8601,
+        producer: 'tasks_service',
         data: {
           employee_id: @task.account.public_id,
+          title: @task.title,
+          status: 'pending',
           cost: rand(-20..-10)
         }
       }
 
-      Karafka.producer.produce_sync(topic: 'tasks-stream', payload: event.to_json)
+      result = SchemaRegistry.validate_event(event, 'tasks.created', version: 1)
+
+      Karafka.producer.produce_sync(topic: 'tasks', payload: event.to_json) if result.success?
 
       redirect_to @task, notice: "Task was successfully created."
     else
@@ -45,18 +53,26 @@ class TasksController < ApplicationController
   # PATCH/PUT /tasks/1
   def update
     if @task.update(task_params)
-      completed = task_params[:completed].true?
+      completed = task_params[:completed] == '1'
 
       if completed
         event = {
+          event_id: SecureRandom.uuid,
+          event_version: 1,
           event_name: 'TaskCompleted',
+          event_time: Time.now.utc.iso8601,
+          producer: 'tasks_service',
           data: {
             employee_id: @task.account.public_id,
+            title: @task.title,
+            status: 'completed',
             cost: rand(20..40)
           }
         }
 
-        Karafka.producer.produce_sync(topic: 'tasks-stream', payload: event.to_json)
+        result = SchemaRegistry.validate_event(event, 'tasks.completed', version: 1)
+
+        Karafka.producer.produce_sync(topic: 'tasks-stream', payload: event.to_json) if result.success?
       end
 
       redirect_to @task, notice: "Task was successfully updated.", status: :see_other
@@ -76,16 +92,22 @@ class TasksController < ApplicationController
 
     Task.pending.each do |task|
       if task.update(account: Account.employee.sample)
-
         event = {
+          event_id: SecureRandom.uuid,
+          event_version: 1,
           event_name: 'TaskAssigned',
+          event_time: Time.now.utc.iso8601,
+          producer: 'tasks_service',
           data: {
             employee_id: task.account.public_id,
-            cost: rand(-20..-10)
+            title: task.title,
+            status: 'pending'
           }
         }
 
-        Karafka.producer.produce_sync(topic: 'tasks-stream', payload: event.to_json)
+        result = SchemaRegistry.validate_event(event, 'tasks.assigned', version: 1)
+
+        Karafka.producer.produce_sync(topic: 'tasks-stream', payload: event.to_json) if result.success?
       end
     end
 

@@ -41,3 +41,5 @@ gem "doorkeeper", "~> 5.6"
 gem "omniauth-oauth2", "~> 1.8"
 
 gem "waterdrop", "~> 2.6"
+
+gem "schema_registry", github: "davydovanton/event_schema_registry", ref: "refs/pull/8/head"

@@ -10,10 +10,11 @@ class AccountsConsumer < ApplicationConsumer
       payload = message.payload
 
       event_name = payload['event_name']
+      event_version = payload['event_version']
       data = payload['data']
 
-      case event_name
-      when 'AccountCreated'
+      case [event_name, event_version]
+      when ['AccountCreated', 1]
         Account.create!(
           public_id: data['public_id'],
           email: data['email'],
@@ -21,7 +22,7 @@ class AccountsConsumer < ApplicationConsumer
           position: data['position'],
           role: data['role']
         )
-      when 'AccountUpdated'
+      when ['AccountUpdated', 1]
         account = Account.find_by(public_id: data['public_id'])
 
         next if account.blank?
@@ -32,7 +33,7 @@ class AccountsConsumer < ApplicationConsumer
           position: data['position'],
           role: data['role']
         )
-      when 'AccountRoleChanged'
+      when ['AccountRoleChanged', 1]
         account = Account.find_by(public_id: data['public_id'])
 
         next if account.blank?
