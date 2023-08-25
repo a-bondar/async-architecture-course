@@ -21,7 +21,11 @@ class AccountsController < ApplicationController
 
       if @account.update(account_params)
         event = {
+          event_id: SecureRandom.uuid,
+          event_version: 1,
           event_name: 'AccountUpdated',
+          event_time: Time.now.utc.iso8601,
+          producer: 'auth_service',
           data: {
             public_id: @account.public_id,
             email: @account.email,
@@ -30,15 +34,26 @@ class AccountsController < ApplicationController
           }
         }
 
-        KAFKA_PRODUCER.produce_sync(topic: 'accounts-stream', payload: event.to_json)
+        result = SchemaRegistry.validate_event(event, 'accounts.updated', version: 1)
+
+        KAFKA_PRODUCER.produce_sync(topic: 'accounts-stream', payload: event.to_json) if result.success?
 
         if new_role
           event = {
+            event_id: SecureRandom.uuid,
+            event_version: 1,
             event_name: 'AccountRoleChanged',
-            data: { public_id: @account.public_id, role: @account.role }
+            event_time: Time.now.utc.iso8601,
+            producer: 'auth_service',
+            data: {
+              public_id: @account.public_id,
+              role: new_role
+            }
           }
 
-          KAFKA_PRODUCER.produce_sync(topic: 'accounts', payload: event.to_json)
+          result = SchemaRegistry.validate_event(event, 'accounts.role_changed', version: 1)
+
+          KAFKA_PRODUCER.produce_sync(topic: 'accounts', payload: event.to_json) if result.success?
         end
 
         format.html { redirect_to root_path, notice: 'Account was successfully updated.' }
@@ -52,11 +67,19 @@ class AccountsController < ApplicationController
     @account.update(active: false, disabled_at: Time.now)
 
     event = {
+      event_id: SecureRandom.uuid,
+      event_version: 1,
       event_name: 'AccountDeleted',
-      data: { public_id: @account.public_id }
+      event_time: Time.now.utc.iso8601,
+      producer: 'auth_service',
+      data: {
+        public_id: @account.public_id
+      }
     }
 
-    KAFKA_PRODUCER.produce_sync(topic: 'accounts-stream', payload: event.to_json)
+    result = SchemaRegistry.validate_event(event, 'accounts.deleted', version: 1)
+
+    KAFKA_PRODUCER.produce_sync(topic: 'accounts-stream', payload: event.to_json) if result.success?
 
     respond_to do |format|
       format.html { redirect_to root_path, notice: 'Account was successfully destroyed.' }
