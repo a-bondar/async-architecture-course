@@ -14,8 +14,7 @@ class SessionsController < ApplicationController
 
     session[:account] = account
 
-    # @todo add own path
-    redirect_to root_path
+    redirect_to dashboard_index_path
   end
 
   def destroy
