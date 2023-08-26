@@ -1,0 +1,21 @@
+<h1>Dashboard</h1>
+<h2>
+  <% @balance %>
+
+  <%@items.each do |item| %>
+    <p>
+      <strong>Balance:</strong>
+      <%= item.balance %>
+    </p>
+
+    <p>
+      <strong>Transaction:</strong>
+      <%= item.transaction %>
+    </p>
+
+    <p>
+      <strong>Description:</strong>
+      <%= item.description %>
+    </p>
+  <% end %>
+</h2>
