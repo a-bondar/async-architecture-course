@@ -33,7 +33,7 @@ class TasksController < ApplicationController
         event_time: Time.now.utc.iso8601,
         producer: 'tasks_service',
         data: {
-          employee_id: @task.account.public_id,
+          employee_public_id: @task.account.public_id,
           title: @task.title,
           status: 'pending',
           cost: rand(-20..-10)
@@ -63,7 +63,7 @@ class TasksController < ApplicationController
           event_time: Time.now.utc.iso8601,
           producer: 'tasks_service',
           data: {
-            employee_id: @task.account.public_id,
+            employee_public_id: @task.account.public_id,
             title: @task.title,
             status: 'completed',
             cost: rand(20..40)
@@ -99,7 +99,7 @@ class TasksController < ApplicationController
           event_time: Time.now.utc.iso8601,
           producer: 'tasks_service',
           data: {
-            employee_id: task.account.public_id,
+            employee_public_id: task.account.public_id,
             title: task.title,
             status: 'pending'
           }

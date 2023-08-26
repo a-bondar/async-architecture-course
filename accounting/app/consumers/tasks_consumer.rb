@@ -14,7 +14,7 @@ class TasksConsumer < ApplicationConsumer
 
       case [event_name, event_version]
       when ['TaskCreated', 1]
-        account = Account.find_by(public_id: data['employee_id'])
+        account = Account.find_by(public_id: data['employee_public_id'])
 
         task = Task.create!(
           title: data['title'],
@@ -32,7 +32,7 @@ class TasksConsumer < ApplicationConsumer
 
         account.update!(balance: account.balance + data['cost'])
       when ['TaskAssigned', 1]
-        account = Account.find_by(public_id: data['employee_id'])
+        account = Account.find_by(public_id: data['employee_public_id'])
         task = Task.update!(account:, cost: data['cost'])
 
         AuditLog.create!(
@@ -45,7 +45,7 @@ class TasksConsumer < ApplicationConsumer
 
         account.update!(balance: account.balance + data['cost'])
       when ['TaskCompleted', 1]
-        account = Account.find_by(public_id: data['employee_id'])
+        account = Account.find_by(public_id: data['employee_public_id'])
         task = Task.update!(account:, status: data['status'], cost: data['cost'])
 
         AuditLog.create!(

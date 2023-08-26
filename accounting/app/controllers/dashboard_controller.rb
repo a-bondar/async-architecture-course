@@ -15,7 +15,7 @@ class DashboardController < ApplicationController
     if current_account.employee?
       current_account.balance
     else
-      (Task.completed.pluck(:cost).sum + Task.pending.pluck(:cost)) * -1
+      (Task.completed.pluck(:cost).sum + Task.pending.pluck(:cost).sum) * -1
     end
 
   end
